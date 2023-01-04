@@ -5,40 +5,54 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView, CreateView
 
 from ads.models import Ad, Category
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class AdView(View):
-    def get(self, request):
-        ads = Ad.objects.all()
+class AdListView(ListView):
+    model = Ad
+
+    def get(self, request, *args, **kwargs):
+        super().get(request, *args, **kwargs)
+        ads = self.object_list
         response = []
         for ad in ads:
             response.append(
                 {
                     "id": ad.pk,
                     "name": ad.name,
-                    "author": ad.author,
                     "price": ad.price,
                     "description": ad.description,
-                    "address": ad.address,
                     "is_published": ad.is_published,
+                    "test": ad.image
                 }
             )
         return JsonResponse(response, safe=False)
 
-    def post(self, request):
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AdCreateView(CreateView):
+    model = Ad
+    fields = [
+        'name',
+        'description',
+        'price',
+        'is_published',
+        'image',
+    ]
+
+    def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
-        ad = Ad()
-        ad.name = data["name"]
-        ad.author = data["author"]
-        ad.price = data["price"]
-        ad.description = data["description"]
-        ad.address = data["address"]
-        ad.is_published = data["is_published"]
-        ad.save()
+        ad = Ad.objects.create(
+            name=data["name"],
+            author=data["author"],
+            price=data["price"],
+            description=data["description"],
+            address=data["address"],
+            is_published=data["is_published"],
+        )
         return JsonResponse(
             {
                 "id": ad.pk,
@@ -62,10 +76,10 @@ class AdDetailView(DetailView):
             {
                 "id": ad.pk,
                 "name": ad.name,
-                "author": ad.author,
+                # "author": ad.author,
                 "price": ad.price,
                 "description": ad.description,
-                "address": ad.address,
+                # "address": ad.address,
                 "is_published": ad.is_published,
             },
             safe=False
