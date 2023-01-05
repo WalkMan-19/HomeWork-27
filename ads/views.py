@@ -7,7 +7,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView, CreateView
 
-from ads.models import Ad, Category
+from ads.models import Ad, Category, Location
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -16,17 +16,19 @@ class AdListView(ListView):
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
-        ads = self.object_list
         response = []
-        for ad in ads:
+
+        for ad in self.object_list:
             response.append(
                 {
                     "id": ad.pk,
                     "name": ad.name,
+                    "author_id": ad.author_id,
                     "price": ad.price,
                     "description": ad.description,
                     "is_published": ad.is_published,
-                    "test": ad.image
+                    "image": ad.image,
+                    "category_id": ad.category_id,
                 }
             )
         return JsonResponse(response, safe=False)
@@ -37,31 +39,35 @@ class AdCreateView(CreateView):
     model = Ad
     fields = [
         'name',
+        'author_id'
         'description',
         'price',
         'is_published',
         'image',
+        'category_id',
     ]
 
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
         ad = Ad.objects.create(
             name=data["name"],
-            author=data["author"],
+            author_id=data["author_id"],
             price=data["price"],
             description=data["description"],
-            address=data["address"],
             is_published=data["is_published"],
+            image=data["image"],
+            category_id=data["category_id"],
         )
         return JsonResponse(
             {
                 "id": ad.pk,
                 "name": ad.name,
-                "author": ad.author,
+                "author_id": ad.author_id,
                 "price": ad.price,
                 "description": ad.description,
-                "address": ad.address,
                 "is_published": ad.is_published,
+                "image": ad.image,
+                "category_id": ad.category_id,
             },
             safe=False
         )
@@ -76,22 +82,25 @@ class AdDetailView(DetailView):
             {
                 "id": ad.pk,
                 "name": ad.name,
-                # "author": ad.author,
+                "author_id": ad.author_id,
                 "price": ad.price,
                 "description": ad.description,
-                # "address": ad.address,
                 "is_published": ad.is_published,
+                "image": ad.image,
+                "category_id": ad.category_id,
             },
             safe=False
         )
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class CategoryView(View):
-    def get(self, request):
-        categories = Category.objects.all()
+class CategoryListView(ListView):
+    model = Category
+
+    def get(self, request, *args, **kwargs):
+        super().get(request, *args, **kwargs)
         response = []
-        for category in categories:
+        for category in self.object_list:
             response.append(
                 {
                     "id": category.pk,
@@ -100,7 +109,13 @@ class CategoryView(View):
             )
         return JsonResponse(response, safe=False)
 
-    def post(self, request):
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CategoryCreateView(CreateView):
+    model = Category
+    fields = ['id', 'name']
+
+    def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
         category = Category()
         category.name = data["name"]
@@ -114,6 +129,7 @@ class CategoryView(View):
         )
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class CategoryDetailView(DetailView):
     model = Category
 
@@ -125,4 +141,61 @@ class CategoryDetailView(DetailView):
                 "name": category.name,
             },
             safe=False
+        )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class LocationListView(ListView):
+    model = Location
+
+    def get(self, request, *args, **kwargs):
+        super(LocationListView, self).get(request, *args, **kwargs)
+        response = []
+        for location in self.object_list:
+            response.append(
+                {
+                    "id": location.pk,
+                    "name": location.name,
+                    "lat": location.lat,
+                    "lng": location.lng
+                }
+            )
+        return JsonResponse(response, safe=False)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class LocationCreateView(CreateView):
+    model = Location
+    fields = ["name", "lat", "lng"]
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        location = Location
+        location.name = data["name"]
+        location.lat = data["lat"]
+        location.lng = data["lng"]
+        location.save()
+        return JsonResponse(
+            {
+                "id": location.pk,
+                "name": location.name,
+                "lat": location.lat,
+                "lng": location.lng,
+            }, safe=False
+        )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class LocationDetailView(DetailView):
+    model = Location
+
+    def get(self, request, *args, **kwargs):
+        location = self.get_object()
+        return JsonResponse(
+            {
+                "id": location.pk,
+                "name": location.name,
+                "lat": location.lat,
+                "lng": location.lng,
+            }, safe=False
         )

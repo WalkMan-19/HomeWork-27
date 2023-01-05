@@ -22,13 +22,20 @@ from HW27 import settings
 from ads import views
 
 urlpatterns = [
+
     path('admin/', admin.site.urls),
     path('', lambda request: JsonResponse({"status": "ok"}, status=200)),
 
-    path('cat/', views.CategoryView.as_view()),
+    path('cat/', views.CategoryListView.as_view()),
     path('cat/<int:pk>', views.CategoryDetailView.as_view()),
+    path('cat/', views.CategoryCreateView.as_view()),
 
     path('ad/', views.AdListView.as_view()),
     path('ad/<int:pk>', views.AdDetailView.as_view()),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('ad/', views.AdCreateView.as_view()),
 
+    path('loc/', views.LocationListView.as_view()),
+    path('loc/<int:pk>', views.LocationDetailView.as_view()),
+    path('loc/', views.LocationCreateView.as_view()),
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

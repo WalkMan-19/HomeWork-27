@@ -7,8 +7,6 @@ USER_DATA = "../datasets/user.csv"
 LOCATION_DATA = "../datasets/location.csv"
 
 
-
-
 def read_file(data, json_file, model):
     result = []
     try:

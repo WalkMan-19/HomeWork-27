@@ -12,30 +12,23 @@ class Location(models.Model):
 
 
 class User(models.Model):
+    ROLES = [
+        ('member', 'Пользователь'),
+        ('admin', 'Администратор'),
+        ('moderator', 'Модератор'),
+    ]
+
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     username = models.CharField(max_length=50)
     password = models.CharField(max_length=100)
-    role = models.CharField(max_length=100)
+    role = models.CharField(max_length=100, choices=ROLES, default='member')
     age = models.PositiveIntegerField()
-    location_id = models.ForeignKey(Location, on_delete=models.CASCADE, null=True)
+    location_id = models.ForeignKey(Location, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Автор'
         verbose_name_plural = 'Авторы'
-
-
-class Ad(models.Model):
-    name = models.CharField(max_length=150)
-    author_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    price = models.PositiveIntegerField()
-    description = models.CharField(max_length=300)
-    is_published = models.BooleanField(default=True)
-    image = models.ImageField(upload_to='logos/')
-
-    class Meta:
-        verbose_name = 'Объявление'
-        verbose_name_plural = 'Объявления'
 
 
 class Category(models.Model):
@@ -44,3 +37,17 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+
+
+class Ad(models.Model):
+    name = models.CharField(max_length=150)
+    author_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_ad')
+    price = models.PositiveIntegerField()
+    description = models.CharField(max_length=300, null=True)
+    is_published = models.BooleanField(default=True)
+    image = models.ImageField(upload_to='logos/', null=True)
+    category_id = models.ManyToManyField(Category)
+
+    class Meta:
+        verbose_name = 'Объявление'
+        verbose_name_plural = 'Объявления'
