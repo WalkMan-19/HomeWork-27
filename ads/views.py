@@ -242,3 +242,42 @@ class UserDetailView(DetailView):
                 "location": user.location.name,
             }
         )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserCreateView(CreateView):
+    model = User
+    fields = [
+        "id",
+        "first_name",
+        "last_name",
+        "username",
+        "password",
+        "role",
+        "age",
+        "location",
+    ]
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        user = User
+        user.first_name = data["first_name"]
+        user.last_name = data["last_name"]
+        user.username = data["username"]
+        user.password = data["password"]
+        user.role = data["role"]
+        user.age = data["age"]
+        user.location = data["location"]
+        user.save()
+        return JsonResponse(
+            {
+                "id": user.pk,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "username": user.username,
+                "password": user.password,
+                "role": user.role,
+                "age": user.age,
+                "location": user.location.name,
+            }
+        )
