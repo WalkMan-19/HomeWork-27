@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import DetailView, ListView, CreateView
+from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
 
 from ads.models import Ad, Category, Location, User
 
@@ -125,7 +125,6 @@ class CategoryCreateView(CreateView):
                 "id": category.pk,
                 "name": category.name,
             },
-            safe=False
         )
 
 
@@ -141,6 +140,38 @@ class CategoryDetailView(DetailView):
                 "name": category.name,
             },
             safe=False
+        )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CategoryUpdateView(UpdateView):
+    model = Category
+    fields = ["id", "name"]
+
+    def patch(self, request, *args, **kwargs):
+        super(CategoryUpdateView, self).post(request, *args, **kwargs)
+        data = json.loads(request.body)
+        self.object.name = data["name"]
+        self.object.save()
+        return JsonResponse(
+            {
+                "id": self.object.pk,
+                "name": self.object.name,
+            }
+        )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CategoryDeleteView(DeleteView):
+    model = Category
+    success_url = '/'
+
+    def delete(self, request, *args, **kwargs):
+        super().delete(request, *args, **kwargs)
+        return JsonResponse(
+            {
+                "status": "ok"
+            }, status=200
         )
 
 

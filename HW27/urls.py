@@ -28,18 +28,20 @@ urlpatterns = [
 
     path('cat/', views.CategoryListView.as_view()),
     path('cat/<int:pk>', views.CategoryDetailView.as_view()),
-    path('cat/', views.CategoryCreateView.as_view()),
+    path('cat/create/', views.CategoryCreateView.as_view()),
+    path('cat/update/<int:pk>', views.CategoryUpdateView.as_view()),
+    path('cat/delete/<int:pk>', views.CategoryDeleteView.as_view()),
 
     path('ad/', views.AdListView.as_view()),
     path('ad/<int:pk>', views.AdDetailView.as_view()),
-    path('ad/', views.AdCreateView.as_view()),
+    path('ad/create/', views.AdCreateView.as_view()),
 
     path('loc/', views.LocationListView.as_view()),
     path('loc/<int:pk>', views.LocationDetailView.as_view()),
-    path('loc/', views.LocationCreateView.as_view()),
+    path('loc/create/', views.LocationCreateView.as_view()),
 
     path('user/', views.UserListView.as_view()),
     path('user/<int:pk>', views.UserDetailView.as_view()),
-    path('user/', views.UserCreateView.as_view()),
+    path('user/create/', views.UserCreateView.as_view()),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
