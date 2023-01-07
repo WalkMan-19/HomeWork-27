@@ -39,6 +39,7 @@ urlpatterns = [
     path('loc/', views.LocationCreateView.as_view()),
 
     path('user/', views.UserListView.as_view()),
-    path('user/<int:pk>', views.UserDetailView.as_view())
+    path('user/<int:pk>', views.UserDetailView.as_view()),
+    path('user/', views.UserCreateView.as_view()),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
