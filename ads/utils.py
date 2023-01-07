@@ -31,13 +31,16 @@ def read_file(data, json_file, model):
                     line["price"] = int(line["price"])
 
                 if "category_id" in line:
-                    line["category_id"] = int(line["category_id"])
+                    line["category"] = int(line["category_id"])
+                    del line["category_id"]
 
                 if "author_id" in line:
-                    line["author_id"] = int(line["author_id"])
+                    line["author"] = int(line["author_id"])
+                    del line["author_id"]
 
                 if "location_id" in line:
-                    line["location_id"] = int(line["location_id"])
+                    line["location"] = int(line["location_id"])
+                    del line["location_id"]
 
                 if "age" in line:
                     line["age"] = int(line["age"])

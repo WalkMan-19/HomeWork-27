@@ -7,7 +7,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView, CreateView
 
-from ads.models import Ad, Category, Location
+from ads.models import Ad, Category, Location, User
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -23,12 +23,12 @@ class AdListView(ListView):
                 {
                     "id": ad.pk,
                     "name": ad.name,
-                    "author_id": ad.author_id,
+                    "author": ad.author.name,
                     "price": ad.price,
                     "description": ad.description,
                     "is_published": ad.is_published,
                     "image": ad.image,
-                    "category_id": ad.category_id,
+                    "category": ad.category.name,
                 }
             )
         return JsonResponse(response, safe=False)
@@ -82,12 +82,12 @@ class AdDetailView(DetailView):
             {
                 "id": ad.pk,
                 "name": ad.name,
-                "author_id": ad.author_id,
+                "author": ad.author.name,
                 "price": ad.price,
                 "description": ad.description,
                 "is_published": ad.is_published,
                 "image": ad.image,
-                "category_id": ad.category_id,
+                "category": ad.category.name,
             },
             safe=False
         )
@@ -198,4 +198,47 @@ class LocationDetailView(DetailView):
                 "lat": location.lat,
                 "lng": location.lng,
             }, safe=False
+        )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserListView(ListView):
+    model = User
+
+    def get(self, request, *args, **kwargs):
+        super().get(request, *args, **kwargs)
+        response = []
+        for user in self.object_list:
+            response.append(
+                {
+                    "id": user.pk,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "username": user.username,
+                    "password": user.password,
+                    "role": user.role,
+                    "age": user.age,
+                    "location": user.location.name,
+                }
+            )
+        return JsonResponse(response, safe=False)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserDetailView(DetailView):
+    model = User
+
+    def get(self, request, *args, **kwargs):
+        user = super().get_object()
+        return JsonResponse(
+            {
+                "id": user.pk,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "username": user.username,
+                "password": user.password,
+                "role": user.role,
+                "age": user.age,
+                "location": user.location.name,
+            }
         )
