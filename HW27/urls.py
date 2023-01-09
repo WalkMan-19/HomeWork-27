@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
-from django.urls import path
+from django.urls import path, include
 
 from HW27 import settings
 from ads import views
@@ -32,9 +32,7 @@ urlpatterns = [
     path('cat/update/<int:pk>', views.CategoryUpdateView.as_view()),
     path('cat/delete/<int:pk>', views.CategoryDeleteView.as_view()),
 
-    path('ad/', views.AdListView.as_view()),
-    path('ad/<int:pk>', views.AdDetailView.as_view()),
-    path('ad/create/', views.AdCreateView.as_view()),
+    path('ad/', include('ads.urls')),
 
     path('loc/', views.LocationListView.as_view()),
     path('loc/<int:pk>', views.LocationDetailView.as_view()),
@@ -45,3 +43,6 @@ urlpatterns = [
     path('user/create/', views.UserCreateView.as_view()),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

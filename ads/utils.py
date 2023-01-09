@@ -31,7 +31,7 @@ def read_file(data, json_file, model):
                     line["price"] = int(line["price"])
 
                 if "category_id" in line:
-                    line["category"] = int(line["category_id"])
+                    line["category"] = [int(line["category_id"])]
                     del line["category_id"]
 
                 if "author_id" in line:

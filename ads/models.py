@@ -43,7 +43,7 @@ class Ad(models.Model):
     name = models.CharField(max_length=150)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_ad')
     price = models.PositiveIntegerField()
-    description = models.CharField(max_length=300, null=True)
+    description = models.CharField(max_length=500, null=True)
     is_published = models.BooleanField(default=True)
     image = models.ImageField(upload_to='logos/', null=True)
     category = models.ManyToManyField(Category)
