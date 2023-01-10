@@ -1,6 +1,7 @@
 import json
 
 from django.core.paginator import Paginator
+from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
@@ -295,6 +296,20 @@ class LocationDetailView(DetailView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
+class LocationDeleteView(DeleteView):
+    model = Location
+    success_url = '/'
+
+    def delete(self, request, *args, **kwargs):
+        super().delete(request, *args, **kwargs)
+        return JsonResponse(
+            {
+                "status": "ok"
+            }, status=200
+        )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
 class UserListView(ListView):
     model = User
 
@@ -324,6 +339,7 @@ class UserDetailView(DetailView):
 
     def get(self, request, *args, **kwargs):
         user = super().get_object()
+
         return JsonResponse(
             {
                 "id": user.pk,
@@ -334,6 +350,7 @@ class UserDetailView(DetailView):
                 "role": user.role,
                 "age": user.age,
                 "location": user.location.name,
+                "total_ads": user.user_ad.count()
             }
         )
 
@@ -354,14 +371,15 @@ class UserCreateView(CreateView):
 
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
-        user = User
-        user.first_name = data["first_name"]
-        user.last_name = data["last_name"]
-        user.username = data["username"]
-        user.password = data["password"]
-        user.role = data["role"]
-        user.age = data["age"]
-        user.location = data["location"]
+        user = User.objects.create(
+            first_name=data["first_name"],
+            last_name=data["last_name"],
+            username=data["username"],
+            password=data["password"],
+            role=data["role"],
+            age=data["age"],
+            location=Location.objects.get_or_create(name=data["location"])
+        )
         user.save()
         return JsonResponse(
             {
@@ -374,4 +392,57 @@ class UserCreateView(CreateView):
                 "age": user.age,
                 "location": user.location.name,
             }
+        )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserUpdateView(UpdateView):
+    model = User
+    fields = [
+        "id",
+        "first_name",
+        "last_name",
+        "username",
+        "password",
+        "role",
+        "age",
+        "location",
+    ]
+
+    def patch(self, request, *args, **kwargs):
+        super(UserUpdateView, self).post(request, *args, **kwargs)
+        data = json.loads(request.body)
+        self.object.first_name = data["first_name"],
+        self.object.last_name = data["last_name"],
+        self.object.username = data["username"],
+        self.object.password = data["password"],
+        self.object.role = data["role"],
+        self.object.age = data["age"],
+        self.object.location = Location.objects.get_or_create(name=data["location"])
+        self.object.save()
+        return JsonResponse(
+            {
+                "id": self.object.pk,
+                "first_name": self.object.first_name,
+                "last_name": self.object.last_name,
+                "username": self.object.username,
+                "password": self.object.password,
+                "role": self.object.role,
+                "age": self.object.age,
+                "location": self.object.location.name,
+            }, safe=False
+        )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserDeleteView(DeleteView):
+    model = User
+    success_url = '/'
+
+    def delete(self, request, *args, **kwargs):
+        super(UserDeleteView, self).delete(request, *args, **kwargs)
+        return JsonResponse(
+            {
+                "status": "ok"
+            }, status=200
         )

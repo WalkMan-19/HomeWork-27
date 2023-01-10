@@ -37,10 +37,13 @@ urlpatterns = [
     path('loc/', views.LocationListView.as_view()),
     path('loc/<int:pk>', views.LocationDetailView.as_view()),
     path('loc/create/', views.LocationCreateView.as_view()),
+    path('loc/delete/<int:pk>', views.LocationDeleteView.as_view()),
 
     path('user/', views.UserListView.as_view()),
     path('user/<int:pk>', views.UserDetailView.as_view()),
     path('user/create/', views.UserCreateView.as_view()),
+    path('user/update/<int:pk>', views.UserUpdateView.as_view()),
+    path('user/delete/<int:pk>', views.UserDeleteView.as_view()),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
